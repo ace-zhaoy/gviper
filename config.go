@@ -7,6 +7,7 @@ import (
 	"github.com/mitchellh/mapstructure"
 	"github.com/spf13/viper"
 	"path/filepath"
+	"time"
 )
 
 type Listener func(viper *viper.Viper) error
@@ -133,7 +134,7 @@ func (c *Config) buildChangeFunc(cp *configParam) func() error {
 		defer errors.Recover(func(e error) { err = e })
 		c.viper.Set(cp.configName, cp.viper.AllSettings())
 		if cp.data != nil {
-			err = c.viper.Unmarshal(cp.data, func(dc *mapstructure.DecoderConfig) { dc.TagName = cp.tagName })
+			err = cp.viper.Unmarshal(cp.data, func(dc *mapstructure.DecoderConfig) { dc.TagName = cp.tagName })
 			errors.Check(errors.Wrap(err, "unmarshal config [%s] failed", cp.configName))
 		}
 		if cp.onChange != nil {
@@ -155,12 +156,93 @@ func (c *Config) Load() (err error) {
 
 func (c *Config) Watch() {
 	uslice.ForEach(c.configs, func(cp *configParam) {
-		c.viper.OnConfigChange(func(_ fsnotify.Event) {
+		cp.viper.OnConfigChange(func(_ fsnotify.Event) {
 			defer errors.Recover(func(e error) {
 				c.notify(cp.configName, e)
 			})
+			errors.Check(errors.Wrap(cp.viper.ReadInConfig(), "read config [%s] error", cp.configName))
 			errors.Check(c.buildChangeFunc(cp)())
 		})
-		c.viper.WatchConfig()
+		cp.viper.WatchConfig()
 	})
+}
+
+func (c *Config) Has(key string) bool {
+	return c.viper.IsSet(key)
+}
+
+func (c *Config) Get(key string) any {
+	return c.viper.Get(key)
+}
+
+func (c *Config) IsSet(key string) bool {
+	return c.viper.IsSet(key)
+}
+
+func (c *Config) GetString(key string) string {
+	return c.viper.GetString(key)
+}
+
+func (c *Config) GetBool(key string) bool {
+	return c.viper.GetBool(key)
+}
+
+func (c *Config) GetInt(key string) int {
+	return c.viper.GetInt(key)
+}
+
+func (c *Config) GetInt32(key string) int32 {
+	return c.viper.GetInt32(key)
+}
+
+func (c *Config) GetInt64(key string) int64 {
+	return c.viper.GetInt64(key)
+}
+
+func (c *Config) GetUint(key string) uint {
+	return c.viper.GetUint(key)
+}
+
+func (c *Config) GetUint32(key string) uint32 {
+	return c.viper.GetUint32(key)
+}
+
+func (c *Config) GetUint64(key string) uint64 {
+	return c.viper.GetUint64(key)
+}
+
+func (c *Config) GetFloat64(key string) float64 {
+	return c.viper.GetFloat64(key)
+}
+
+func (c *Config) GetTime(key string) time.Time {
+	return c.viper.GetTime(key)
+}
+
+func (c *Config) GetDuration(key string) time.Duration {
+	return c.viper.GetDuration(key)
+}
+
+func (c *Config) GetIntSlice(key string) []int {
+	return c.viper.GetIntSlice(key)
+}
+
+func (c *Config) GetStringSlice(key string) []string {
+	return c.viper.GetStringSlice(key)
+}
+
+func (c *Config) GetStringMap(key string) map[string]any {
+	return c.viper.GetStringMap(key)
+}
+
+func (c *Config) GetStringMapString(key string) map[string]string {
+	return c.viper.GetStringMapString(key)
+}
+
+func (c *Config) GetStringMapStringSlice(key string) map[string][]string {
+	return c.viper.GetStringMapStringSlice(key)
+}
+
+func (c *Config) GetSizeInBytes(key string) uint {
+	return c.viper.GetSizeInBytes(key)
 }
