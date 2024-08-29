@@ -19,3 +19,15 @@ func WithNotification(notifications ...Notification) Option {
 		config.notifications = append(config.notifications, notifications...)
 	}
 }
+
+func WithAutomaticEnv() Option {
+	return func(config *Config) {
+		config.AutomaticEnv()
+	}
+}
+
+func WithAllowEmptyEnv(allowEmptyEnv bool) Option {
+	return func(config *Config) {
+		config.AllowEmptyEnv(allowEmptyEnv)
+	}
+}
