@@ -252,7 +252,7 @@ func TestConfig_Watch(t *testing.T) {
 		t.Fatalf("Failed to write to log.toml: %v", err)
 	}
 	_ = f2.Close()
-	time.Sleep(time.Millisecond)
+	time.Sleep(10 * time.Millisecond)
 
 	assert.Equal(t, "gviper", config.Get("server.name"))
 	assert.Equal(t, "test", config.Get("server.env"))
@@ -339,7 +339,7 @@ func TestConfig_Bind(t *testing.T) {
 	}
 	_ = f1.Close()
 
-	time.Sleep(time.Millisecond)
+	time.Sleep(10 * time.Millisecond)
 	assert.Equal(t, MyServer{
 		Name: "gviper",
 		Env:  "test",
@@ -384,7 +384,7 @@ func TestConfig_BindWithTag(t *testing.T) {
 	}
 	_ = f1.Close()
 
-	time.Sleep(time.Millisecond)
+	time.Sleep(10 * time.Millisecond)
 	assert.Equal(t, MyServer{
 		Name: "gviper",
 		Env:  "test",
@@ -440,7 +440,7 @@ func TestConfig_Watch_RegisterNotification(t *testing.T) {
 		t.Fatalf("Failed to write to server.yaml: %v", err)
 	}
 	_ = f2.Close()
-	time.Sleep(time.Millisecond)
+	time.Sleep(10 * time.Millisecond)
 
 	assert.Equal(t, "server", myNotification.configName)
 	assert.Equal(t, true, errors.Is(myNotification.err, errors.NewWithMessage("unmarshal config [%s] failed", "server")))
@@ -457,7 +457,7 @@ func TestConfig_Watch_RegisterNotification(t *testing.T) {
 		t.Fatalf("Failed to write to server.yaml: %v", err)
 	}
 	_ = f1.Close()
-	time.Sleep(time.Millisecond)
+	time.Sleep(10 * time.Millisecond)
 
 	assert.Equal(t, "server", myNotification.configName)
 	assert.Equal(t, true, errors.Is(myNotification.err, errors.NewWithMessage("read config [%s] error", "server")))
