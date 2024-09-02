@@ -207,6 +207,12 @@ func TestConfig_Load(t *testing.T) {
 	}
 }
 
+func TestConfig_Load_error(t *testing.T) {
+	config := NewConfig(".", "server", "log.toml")
+	err := config.Load()
+	assert.Error(t, err)
+}
+
 func TestConfig_Watch(t *testing.T) {
 	d := t.TempDir()
 	t.Logf("tmpdir: %s", d)
@@ -461,4 +467,83 @@ func TestConfig_Watch_RegisterNotification(t *testing.T) {
 
 	assert.Equal(t, "server", myNotification.configName)
 	assert.Equal(t, true, errors.Is(myNotification.err, errors.NewWithMessage("read config [%s] error", "server")))
+}
+
+func TestConfig_find(t *testing.T) {
+	config := &Config{
+		configs: []*configParam{
+			{configName: "config1"},
+			{configName: "config2"},
+		},
+	}
+
+	result := config.find("config1")
+	assert.NotNil(t, result)
+	assert.Equal(t, "config1", result.configName)
+
+	result = config.find("config3")
+	assert.Nil(t, result)
+}
+
+func TestConfig_add(t *testing.T) {
+	config := &Config{
+		configs: []*configParam{},
+	}
+
+	configName := "test"
+	configType := "yaml"
+	configFile := "test.yaml"
+	cp := config.add(configName, configType, configFile)
+	assert.Equal(t, configName, cp.configName)
+	assert.Equal(t, configType, cp.configType)
+	assert.Equal(t, configFile, cp.configFile)
+	assert.Equal(t, 1, len(config.configs))
+
+	cp2 := config.add(configName, configType, configFile)
+	assert.Equal(t, cp, cp2)
+	assert.Equal(t, 1, len(config.configs))
+}
+
+func TestConfig_viper_method(t *testing.T) {
+	config := NewConfig(".")
+	m := map[string]any{
+		"string":               "hello",
+		"bool":                 true,
+		"int":                  1,
+		"int32":                int32(1),
+		"int64":                int64(1),
+		"uint":                 uint(1),
+		"uint32":               uint32(1),
+		"uint64":               uint64(1),
+		"float64":              float64(1.0),
+		"time":                 time.Unix(1725271117, 0),
+		"duration":             time.Second,
+		"intSlice":             []int{1, 2, 3},
+		"stringSlice":          []string{"a", "b", "c"},
+		"stringMap":            map[string]any{"a": "b", "c": "d"},
+		"stringMapString":      map[string]string{"a": "b", "c": "d"},
+		"stringMapStringSlice": map[string][]string{"a": {"b", "c"}, "d": {"e", "f"}},
+		"sizeInBytes":          "1kb",
+	}
+	config.viper.Set("test", m)
+
+	assert.Equal(t, true, config.Has("test.string"))
+	assert.Equal(t, false, config.IsSet("test.string11"))
+	assert.Equal(t, m["string"], config.GetString("test.string"))
+	assert.Equal(t, m["bool"], config.GetBool("test.bool"))
+	assert.Equal(t, m["int"], config.GetInt("test.int"))
+	assert.Equal(t, m["int32"], config.GetInt32("test.int32"))
+	assert.Equal(t, m["int64"], config.GetInt64("test.int64"))
+	assert.Equal(t, m["uint"], config.GetUint("test.uint"))
+	assert.Equal(t, m["uint32"], config.GetUint32("test.uint32"))
+	assert.Equal(t, m["uint64"], config.GetUint64("test.uint64"))
+	assert.Equal(t, m["float64"], config.GetFloat64("test.float64"))
+	assert.Equal(t, m["time"], config.GetTime("test.time"))
+	assert.Equal(t, m["duration"], config.GetDuration("test.duration"))
+	assert.Equal(t, m["intSlice"], config.GetIntSlice("test.intSlice"))
+	assert.Equal(t, m["stringSlice"], config.GetStringSlice("test.stringSlice"))
+	assert.Equal(t, m["stringMap"], config.GetStringMap("test.stringMap"))
+	assert.Equal(t, m["stringMapString"], config.GetStringMapString("test.stringMapString"))
+	assert.Equal(t, m["stringMapStringSlice"], config.GetStringMapStringSlice("test.stringMapStringSlice"))
+	assert.Equal(t, uint(1024), config.GetSizeInBytes("test.sizeInBytes"))
 }

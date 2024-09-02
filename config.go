@@ -43,6 +43,7 @@ func NewConfig(configPath string, names ...string) *Config {
 func NewConfigWithOptions(options ...Option) *Config {
 	c := &Config{
 		viper:             viper.New(),
+		configPath:        ".",
 		defaultConfigType: "yaml",
 	}
 	for _, option := range options {
