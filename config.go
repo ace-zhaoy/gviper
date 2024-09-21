@@ -247,3 +247,11 @@ func (c *Config) GetStringMapStringSlice(key string) map[string][]string {
 func (c *Config) GetSizeInBytes(key string) uint {
 	return c.viper.GetSizeInBytes(key)
 }
+
+func (c *Config) Sub(key string) *viper.Viper {
+	return c.viper.Sub(key)
+}
+
+func (c *Config) AllSettings() map[string]any {
+	return c.viper.AllSettings()
+}
