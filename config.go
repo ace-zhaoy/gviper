@@ -255,3 +255,129 @@ func (c *Config) Sub(key string) *viper.Viper {
 func (c *Config) AllSettings() map[string]any {
 	return c.viper.AllSettings()
 }
+
+func (c *Config) Default(key string, defaultValue any) any {
+	if !c.viper.IsSet(key) {
+		return defaultValue
+	}
+	return c.viper.Get(key)
+}
+
+func (c *Config) DefaultString(key string, defaultValue string) string {
+	if !c.viper.IsSet(key) {
+		return defaultValue
+	}
+	return c.viper.GetString(key)
+}
+
+func (c *Config) DefaultBool(key string, defaultValue bool) bool {
+	if !c.viper.IsSet(key) {
+		return defaultValue
+	}
+	return c.viper.GetBool(key)
+}
+
+func (c *Config) DefaultInt(key string, defaultValue int) int {
+	if !c.viper.IsSet(key) {
+		return defaultValue
+	}
+	return c.viper.GetInt(key)
+}
+
+func (c *Config) DefaultInt32(key string, defaultValue int32) int32 {
+	if !c.viper.IsSet(key) {
+		return defaultValue
+	}
+	return c.viper.GetInt32(key)
+}
+
+func (c *Config) DefaultInt64(key string, defaultValue int64) int64 {
+	if !c.viper.IsSet(key) {
+		return defaultValue
+	}
+	return c.viper.GetInt64(key)
+}
+
+func (c *Config) DefaultUint(key string, defaultValue uint) uint {
+	if !c.viper.IsSet(key) {
+		return defaultValue
+	}
+	return c.viper.GetUint(key)
+}
+
+func (c *Config) DefaultUint32(key string, defaultValue uint32) uint32 {
+	if !c.viper.IsSet(key) {
+		return defaultValue
+	}
+	return c.viper.GetUint32(key)
+}
+
+func (c *Config) DefaultUint64(key string, defaultValue uint64) uint64 {
+	if !c.viper.IsSet(key) {
+		return defaultValue
+	}
+	return c.viper.GetUint64(key)
+}
+
+func (c *Config) DefaultFloat64(key string, defaultValue float64) float64 {
+	if !c.viper.IsSet(key) {
+		return defaultValue
+	}
+	return c.viper.GetFloat64(key)
+}
+
+func (c *Config) DefaultTime(key string, defaultValue time.Time) time.Time {
+	if !c.viper.IsSet(key) {
+		return defaultValue
+	}
+	return c.viper.GetTime(key)
+}
+
+func (c *Config) DefaultDuration(key string, defaultValue time.Duration) time.Duration {
+	if !c.viper.IsSet(key) {
+		return defaultValue
+	}
+	return c.viper.GetDuration(key)
+}
+
+func (c *Config) DefaultIntSlice(key string, defaultValue []int) []int {
+	if !c.viper.IsSet(key) {
+		return defaultValue
+	}
+	return c.viper.GetIntSlice(key)
+}
+
+func (c *Config) DefaultStringSlice(key string, defaultValue []string) []string {
+	if !c.viper.IsSet(key) {
+		return defaultValue
+	}
+	return c.viper.GetStringSlice(key)
+}
+
+func (c *Config) DefaultStringMap(key string, defaultValue map[string]any) map[string]any {
+	if !c.viper.IsSet(key) {
+		return defaultValue
+	}
+	return c.viper.GetStringMap(key)
+}
+
+func (c *Config) DefaultStringMapString(key string, defaultValue map[string]string) map[string]string {
+	if !c.viper.IsSet(key) {
+		return defaultValue
+	}
+	return c.viper.GetStringMapString(key)
+}
+
+func (c *Config) DefaultStringMapStringSlice(key string, defaultValue map[string][]string) map[string][]string {
+	if !c.viper.IsSet(key) {
+		return defaultValue
+	}
+	return c.viper.GetStringMapStringSlice(key)
+}
+
+func (c *Config) DefaultSizeInBytes(key string, defaultValue uint) uint {
+	if !c.viper.IsSet(key) {
+		return defaultValue
+	}
+	return c.viper.GetSizeInBytes(key)
+}
