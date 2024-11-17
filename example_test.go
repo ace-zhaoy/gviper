@@ -3,6 +3,8 @@ package gviper_test
 import (
 	"github.com/ace-zhaoy/gviper"
 	"github.com/ace-zhaoy/gviper/notifications"
+	"github.com/mitchellh/mapstructure"
+	"time"
 )
 
 func ExampleNewConfig() {
@@ -99,13 +101,24 @@ func ExampleConfig_BindWithTag() {
 		Name string `yaml:"name"`
 	}
 
+	type DateConfig struct {
+		Date time.Time `yaml:"date"`
+	}
+
 	config := gviper.NewConfig(".")
 
 	var lc LogConfig
 	var ac AppConfig
+	var dc DateConfig
 
 	config.BindWithTag("log.toml", &lc, "yaml")
 	config.BindWithTag("app", &ac, "yaml")
+	config.BindWithTag("date", &dc, "yaml", func(d *mapstructure.DecoderConfig) {
+		d.DecodeHook = mapstructure.ComposeDecodeHookFunc(
+			d.DecodeHook,
+			mapstructure.StringToTimeDurationHookFunc(),
+		)
+	})
 
 	_ = config.Load()
 	config.Watch()

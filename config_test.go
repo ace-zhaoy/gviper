@@ -10,6 +10,35 @@ import (
 	"time"
 )
 
+func TestDefault(t *testing.T) {
+	d := t.TempDir()
+	t.Logf("tmpdir: %s", d)
+	serverConfigFile := filepath.Join(d, "server.yaml")
+	err := os.WriteFile(serverConfigFile, []byte("name: gviper\ndate: 2021-11-17T16:25:15+08:00"), 0644)
+	if err != nil {
+		t.Fatalf("Failed to create server.yaml: %v", err)
+	}
+
+	type MyServer struct {
+		Name string    `json:"name"`
+		Date time.Time `json:"date"`
+	}
+	var myServer MyServer
+
+	config := Default(d)
+	config.Bind("server", &myServer)
+	err = config.Load()
+	if err != nil {
+		t.Fatalf("Failed to load config: %v", err)
+	}
+
+	td, _ := time.Parse(time.RFC3339, "2021-11-17T16:25:15+08:00")
+	assert.Equal(t, MyServer{
+		Name: "gviper",
+		Date: td,
+	}, myServer)
+}
+
 func TestNewConfig(t *testing.T) {
 	config := NewConfig("/test/path")
 

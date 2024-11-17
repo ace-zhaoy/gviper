@@ -10,24 +10,38 @@ import (
 	"time"
 )
 
+func Default(configPath string) *Config {
+	return NewConfigWithOptions(
+		WithConfigPath(configPath),
+		WithDecoderConfigOptions(func(dc *mapstructure.DecoderConfig) {
+			dc.DecodeHook = mapstructure.ComposeDecodeHookFunc(
+				dc.DecodeHook,
+				mapstructure.StringToTimeHookFunc(time.RFC3339),
+			)
+		}),
+	)
+}
+
 type Listener func(viper *viper.Viper) error
 
 type configParam struct {
-	configName string
-	configType string
-	configFile string
-	tagName    string
-	viper      *viper.Viper
-	onChange   Listener
-	data       any
+	configName           string
+	configType           string
+	configFile           string
+	tagName              string
+	viper                *viper.Viper
+	decoderConfigOptions []viper.DecoderConfigOption
+	onChange             Listener
+	data                 any
 }
 
 type Config struct {
-	viper             *viper.Viper
-	configPath        string
-	defaultConfigType string
-	configs           []*configParam
-	notifications     []Notification
+	viper                *viper.Viper
+	configPath           string
+	defaultConfigType    string
+	configs              []*configParam
+	notifications        []Notification
+	decoderConfigOptions []viper.DecoderConfigOption
 }
 
 func NewConfig(configPath string, names ...string) *Config {
@@ -116,10 +130,11 @@ func (c *Config) Bind(name string, data any) {
 	c.BindWithTag(name, data, "json")
 }
 
-func (c *Config) BindWithTag(name string, data any, tagName string) {
+func (c *Config) BindWithTag(name string, data any, tagName string, decoderConfigOptions ...viper.DecoderConfigOption) {
 	cp := c.resolveConfigParam(name)
 	cp.data = data
-	cp.tagName = tagName
+	cp.decoderConfigOptions = append([]viper.DecoderConfigOption{
+		func(dc *mapstructure.DecoderConfig) { dc.TagName = tagName }}, decoderConfigOptions...)
 }
 
 func (c *Config) RegisterNotification(notifications ...Notification) {
@@ -135,7 +150,9 @@ func (c *Config) buildChangeFunc(cp *configParam) func() error {
 		defer errors.Recover(func(e error) { err = e })
 		c.viper.Set(cp.configName, cp.viper.AllSettings())
 		if cp.data != nil {
-			err = cp.viper.Unmarshal(cp.data, func(dc *mapstructure.DecoderConfig) { dc.TagName = cp.tagName })
+			opts := append([]viper.DecoderConfigOption(nil), c.decoderConfigOptions...)
+			opts = append(opts, cp.decoderConfigOptions...)
+			err = cp.viper.Unmarshal(cp.data, opts...)
 			errors.Check(errors.Wrap(err, "unmarshal config [%s] failed", cp.configName))
 		}
 		if cp.onChange != nil {

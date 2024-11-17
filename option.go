@@ -1,5 +1,7 @@
 package gviper
 
+import "github.com/spf13/viper"
+
 type Option func(*Config)
 
 func WithConfigPath(configPath string) Option {
@@ -29,5 +31,11 @@ func WithAutomaticEnv() Option {
 func WithAllowEmptyEnv(allowEmptyEnv bool) Option {
 	return func(config *Config) {
 		config.AllowEmptyEnv(allowEmptyEnv)
+	}
+}
+
+func WithDecoderConfigOptions(options ...viper.DecoderConfigOption) Option {
+	return func(config *Config) {
+		config.decoderConfigOptions = append(config.decoderConfigOptions, options...)
 	}
 }
