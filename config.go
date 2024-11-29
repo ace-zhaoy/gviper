@@ -137,6 +137,11 @@ func (c *Config) BindWithTag(name string, data any, tagName string, decoderConfi
 		func(dc *mapstructure.DecoderConfig) { dc.TagName = tagName }}, decoderConfigOptions...)
 }
 
+func (c *Config) BindAndListen(name string, data any, listener Listener) {
+	c.Bind(name, data)
+	c.OnChange(name, listener)
+}
+
 func (c *Config) RegisterNotification(notifications ...Notification) {
 	c.notifications = append(c.notifications, notifications...)
 }
